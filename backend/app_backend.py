@@ -4,8 +4,26 @@ import pyodbc
 
 app = Flask(__name__)
 CORS(app) # Enable CORS for cross-origin communication
+# --- SQL Server Authentication Credentials ---
+# NOTE: Replace these placeholder values with your actual SQL Login credentials.
+SQL_USERNAME = "user"  # e.g., "AppUser"
+SQL_PASSWORD = "Password123!"  # e.g., "P@$$w0rd123"
+# ---------------------------------------------
+def get_connection():
+    """Returns a fresh connection using SQL Server Authentication."""
+    
+    # 🚨 Updated Connection String 🚨
+    # Replaced "Trusted_Connection=yes" with "UID" and "PWD"
+    connection_string = (
+        "DRIVER={ODBC Driver 17 for SQL Server};"
+        "SERVER=localhost;"
+        "DATABASE=testdb;"
+        f"UID=user;"
+        f"PWD=Password123!;"
+    )
 
 # Create a function to always return a fresh connection
+'''
 def get_connection():
     # CONNECTION DETAILS
     return pyodbc.connect(
@@ -14,6 +32,7 @@ def get_connection():
         "DATABASE=testdb;"
         "Trusted_Connection=yes;"
     )
+'''
 
 def insert_record(data):
     conn = get_connection()
