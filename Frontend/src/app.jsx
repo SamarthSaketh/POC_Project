@@ -1,58 +1,84 @@
-import { useState } from 'react'
-import './index.css'
+import { useState } from "react";
+import "./index.css";
 
 export default function App() {
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   // Current date
-  const today = new Date()
-  const formattedToday = today.toLocaleString() // shows current date + time
+  const today = new Date();
+  const formattedToday = today.toLocaleDateString(); // only date
   // Date + 60 days
-  const futureDate = new Date()
-  futureDate.setDate(today.getDate() + 60)
-  const formattedFuture = futureDate.toLocaleDateString()
+  const futureDate = new Date();
+  futureDate.setDate(today.getDate() + 60);
+  const formattedFuture = futureDate.toLocaleDateString();
 
   const [fields, setFields] = useState({
-    Originator: 'Sriram',
-    Supervisor: 'Sridhar',
-    'Quality Approver': 'Ramu',
-    'Quality Reviewer': 'Ratni',
-    'Date Opened': formattedToday,
-    'Original Date Due': formattedFuture,
-    'Date Due': formattedFuture,
-    Title: 'Tablet hardness for ABC Tablets (Batch No: B1000) exceeded the limit'
-  })
-
-  const description = [
-    'Tablet hardness for ABC Tablets (Batch No: B1000) exceeded the limit'
-  ]
+    Originator: "",
+    Supervisor: "",
+    "Quality Approver": "",
+    "Quality Reviewer": "",
+    "Date Opened": formattedToday,
+    "Original Date Due": formattedFuture,
+    "Date Due": formattedFuture,
+    Title: "",
+    Description: "",
+    BatchNo: ""
+  });
 
   const handleChange = (key, value) => {
-    setFields(prev => ({ ...prev, [key]: value }))
-  }
+    setFields((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSave = async () => {
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const res = await fetch("http://localhost:5000/submit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(fields),
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setMessage(`✅ Saved: ${data.inserted_title}`);
+        setIsEditing(false);
+      } else {
+        setMessage(`❌ Error: ${data.message}`);
+      }
+    } catch (err) {
+      setMessage(`❌ Error connecting to server: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
       {/* Header */}
       <header className="top-bar">
         <div className="title-area">
-          <h1 className="record-title">
-            211 - {fields.Title}
-          </h1>
+          <h1 className="record-title">211 - {fields.Title || "New Record"}</h1>
           <div className="record-sub">Pending Data Review</div>
-          <div className="record-sub">Created: {fields['Date Opened']}</div>
+          <div className="record-sub">
+            Created: {fields["Date Opened"] || "—"}
+          </div>
         </div>
       </header>
 
       {/* Tabs */}
       <nav className="tabs" role="tablist">
         {[
-          'General Information',
-          'Preliminary Investigation',
-          'Review & Approve',
-          'Record Closure'
+          "General Information",
+          "Preliminary Investigation",
+          "Review & Approve",
+          "Record Closure",
         ].map((t, i) => (
-          <button key={t} className={i === 0 ? 'tab active' : 'tab'}>
+          <button key={t} className={i === 0 ? "tab active" : "tab"}>
             {t}
           </button>
         ))}
@@ -70,45 +96,43 @@ export default function App() {
                 {isEditing ? (
                   <input
                     className="edit-input"
+                    type={label.toLowerCase().includes("date") ? "date" : "text"}
                     value={value}
-                    onChange={e => handleChange(label, e.target.value)}
+                    onChange={(e) => handleChange(label, e.target.value)}
                   />
                 ) : (
-                  <span>{value || '—'}</span>
+                  <span>{value || "—"}</span>
                 )}
               </div>
             </div>
           ))}
         </div>
 
+        {/* Buttons only for General Information */}
         <div style={{ marginTop: 12 }}>
-          <button
-            className="btn"
-            onClick={() => setIsEditing(!isEditing)}
-          >
-            {isEditing ? 'Cancel' : 'Edit'}
+          <button className="btn" onClick={() => setIsEditing(!isEditing)}>
+            {isEditing ? "Cancel" : "Edit General Info"}
           </button>
           {isEditing && (
             <button
               className="btn"
-              onClick={() => {
-                console.log('Save clicked', fields)
-                setIsEditing(false)
-              }}
+              onClick={handleSave}
               style={{ marginLeft: 8 }}
+              disabled={loading}
             >
-              Save
+              {loading ? "Saving..." : "Save"}
             </button>
           )}
         </div>
 
+        {message && <div style={{ marginTop: 10 }}>{message}</div>}
+
+        {/* Description (unchanged) */}
         <h3 className="desc-title">Description</h3>
         <div className="description">
-          {description.map((p, i) => (
-            <p key={i}>{p}</p>
-          ))}
+          <p>{fields.Description || "—"}</p>
         </div>
       </main>
     </div>
-  )
+  );
 }
