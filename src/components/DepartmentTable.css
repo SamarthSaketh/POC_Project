@@ -1,0 +1,30 @@
+.table-wrapper {
+  width: 85%;
+  margin: 20px auto;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+}
+.table-scroll {
+  max-height: 300px;
+  overflow-y: auto;
+}
+.dept-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.dept-table th,
+.dept-table td {
+  border: 1px solid #ccc;
+  padding: 12px;
+  text-align: center;
+}
+.dept-table th {
+  background-color: #004aad;
+  color: white;
+}
+.dept-table tr:nth-child(even) {
+  background-color: #f3f7ff;
+}
+
