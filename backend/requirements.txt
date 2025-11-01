@@ -1,3 +1,8 @@
+flask
+flask-cors
+pymongo
+dnspython
+python-dotenv
 annotated-types==0.7.0
 anyio==4.9.0
 blinker==1.9.0
@@ -52,3 +57,4 @@ typing_extensions==4.14.1
 urllib3==2.5.0
 uvicorn==0.35.0
 Werkzeug==3.1.3
+
